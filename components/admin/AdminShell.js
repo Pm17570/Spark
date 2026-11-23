@@ -32,7 +32,6 @@ export default function AdminShell({ current = 'exams', children }) {
         <input id="pw" type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="รหัสผ่านแอดมิน" autoFocus />
         {err && <div className="alert bad">{err}</div>}
         <button className="btn primary lg" disabled={!pw}>เข้าสู่ระบบ</button>
-        <div className="small muted">รหัสผ่านครั้งแรกแสดงใน console ตอนเริ่มเซิร์ฟเวอร์ และอยู่ในไฟล์ data/ADMIN-PASSWORD.txt</div>
       </form>
       <a href="/" className="small muted">← หน้าเข้าสอบ</a>
     </div></div>
