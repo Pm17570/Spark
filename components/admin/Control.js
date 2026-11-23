@@ -36,7 +36,7 @@ export default function Control({ ov, offset, reload }) {
       <div className="card">
         <div className="row between"><div className="row"><h3 style={{ margin: 0 }}>สถานะการสอบ</h3><span className={'badge ' + cls}>{lab}</span></div>
           <div className="row">
-            <button className="btn primary" onClick={() => ctl({ status: 'open' }, 'เปิดสอบแล้ว')} disabled={ov.phase === 'open'}>▶ เปิดสอบทันที</button>
+            <button className="btn primary" onClick={() => ctl({ status: 'open', openAt: null }, 'เปิดสอบแล้ว (ยกเลิกเวลาเริ่มที่ตั้งไว้)')} disabled={ov.phase === 'open'}>▶ เปิดสอบทันที</button>
             <button className="btn danger" onClick={() => confirm('ปิดสอบ? ทุกคนที่กำลังทำจะถูกส่งอัตโนมัติ') && ctl({ status: 'closed' }, 'ปิดสอบแล้ว')} disabled={ov.phase === 'closed'}>■ ปิดสอบ</button>
             <button className="btn" onClick={() => ctl({ status: 'draft' }, 'เปลี่ยนเป็นฉบับร่าง')}>ฉบับร่าง</button>
           </div></div>
@@ -56,7 +56,7 @@ export default function Control({ ov, offset, reload }) {
           <div className="field"><label>เวลาทำต่อคน (นาที, 0 = ไม่จำกัด)</label><input type="number" min="0" max="1440" value={f.durationMin} onChange={(e) => setF({ ...f, durationMin: e.target.value })} /></div>
         </div>
         <div className="row">
-          <button className="btn primary" onClick={() => ctl({ openAt: fromLocalInput(f.openAt), closeAt: fromLocalInput(f.closeAt), durationMin: Number(f.durationMin) || 0, ...(f.openAt && ex.status !== 'open' ? { status: 'scheduled' } : {}) })}>บันทึกเวลา</button>
+          <button className="btn primary" onClick={() => ctl({ openAt: fromLocalInput(f.openAt), closeAt: fromLocalInput(f.closeAt), durationMin: Number(f.durationMin) || 0, ...(f.openAt ? (ex.status !== 'closed' && ex.status !== 'draft' ? { status: 'scheduled' } : {}) : ex.status === 'scheduled' ? { status: 'open' } : {}) }, f.openAt ? 'บันทึกแล้ว — ผู้เข้าสอบจะกดเริ่มได้เมื่อถึงเวลาเริ่มเท่านั้น' : 'บันทึกแล้ว')}>บันทึกเวลา</button>
           <span className="small muted">เวลาในเครื่องคุณ · ปัจจุบัน {fmtDT(now)}</span>
         </div>
         <div className="row"><b className="small">เพิ่ม/ลดเวลาให้ทุกคน:</b>

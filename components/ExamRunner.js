@@ -89,6 +89,12 @@ export default function ExamRunner() {
     if (remaining !== null && remaining <= 0) { flush().then(() => load(false)); }
   }, [remaining !== null && remaining <= 0]); // eslint-disable-line
 
+  // ถึงเวลาเปิดสอบ → รีเฟรชสถานะทันที เพื่อให้ปุ่มเริ่มขึ้นโดยไม่ต้องรอรอบโพล
+  const waitLeft = st && !st.attempt && st.exam.phase === 'waiting' && st.exam.openAt ? st.exam.openAt - now : null;
+  useEffect(() => {
+    if (waitLeft !== null && waitLeft <= 0) { const t = setTimeout(() => load(false), 300); return () => clearTimeout(t); }
+  }, [waitLeft !== null && waitLeft <= 0, now > 0 && Math.floor(now / 2000)]); // eslint-disable-line
+
   async function start() {
     setErr('');
     const r = await api('/api/exam/start', { method: 'POST' });
