@@ -1,4 +1,4 @@
-import { json, fail, readJson, isAdmin, noAdmin } from '@/lib/auth';
+import { json, fail, readJson, isAdmin, noAdmin, getStaff, noStaff, forbidden } from '@/lib/auth';
 import { participantById, updateParticipant, regenCode, deleteParticipant, adminAttemptAction } from '@/lib/repo';
 
 async function load(params) {
@@ -7,10 +7,13 @@ async function load(params) {
   return p && p.exam_id === id ? p : null;
 }
 export async function PATCH(req, { params }) {
-  if (!(await isAdmin())) return noAdmin();
+  const st = await getStaff();
+  if (!st) return noStaff();
   const p = await load(params);
   if (!p) return fail('ไม่พบผู้เข้าสอบ', 404);
   const b = (await readJson(req, 5000)) || {};
+  // moderator ทำได้เฉพาะ เพิ่มเวลา / ให้ทำต่อ
+  if (st.role !== 'admin' && !['extend', 'unsubmit'].includes(b.action)) return forbidden();
   switch (b.action) {
     case 'rename':
       updateParticipant(p.id, { name: b.name ?? p.name, school: b.school ?? p.school });

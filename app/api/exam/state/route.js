@@ -4,6 +4,7 @@ import { studentPaper } from '@/lib/exam';
 import { getAnswers, gradesOf } from '@/lib/repo';
 import { gradeAttempt } from '@/lib/grade';
 import { examCounts } from '@/lib/model';
+import { participantChatMeta } from '@/lib/chat';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,6 +17,7 @@ export async function GET(req) {
     serverNow: t,
     me: { name: p.name, school: p.school },
     exam: { title: exam.title, description: exam.description, durationMin: exam.durationMin + exam.extraMin, phase, openAt: exam.openAt, closeAt: exam.closeAt, counts: examCounts(exam) },
+    chat: participantChatMeta(p.id),
     attempt: attempt ? { startedAt: attempt.startedAt, submittedAt: attempt.submittedAt, auto: attempt.auto, deadline } : null,
   };
   if (attempt && !attempt.submittedAt && full) {

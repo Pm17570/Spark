@@ -5,6 +5,7 @@ import { api, fmtDT } from '@/lib/client';
 import { fmtDuration } from '@/lib/model';
 import Rich from './Rich';
 import PartView, { Img, isAnswered } from './PartView';
+import ChatWidget from './ChatWidget';
 
 export default function ExamRunner() {
   const router = useRouter();
@@ -43,7 +44,7 @@ export default function ExamRunner() {
     const t = setInterval(async () => {
       const d = await load(false);
       if (d?.attempt && !d.attempt.submittedAt && !paper) load(true);
-    }, 8000);
+    }, 6000);
     return () => clearInterval(t);
   }, [load, paper]);
 
@@ -127,6 +128,7 @@ export default function ExamRunner() {
 
   if (!st) return <div className="wrap center muted" style={{ paddingTop: 80 }}>กำลังโหลด…</div>;
 
+  const chatEl = <ChatWidget chat={st.chat} />;
   const Top = ({ children }) => (
     <div className="exam-top">
       <div><span className="brand">SPARK</span><span className="muted small" style={{ marginLeft: 10 }}>{st.me.name || 'ผู้เข้าสอบ'}</span></div>
@@ -154,6 +156,7 @@ export default function ExamRunner() {
             </>
           ) : <p>ผลคะแนนจะประกาศโดยผู้จัดการสอบ</p>}
         </div></div>
+        {chatEl}
       </>
     );
   }
@@ -184,6 +187,7 @@ export default function ExamRunner() {
           {ph === 'draft' && <div className="alert">ข้อสอบนี้ยังไม่เปิดให้เข้าสอบ กรุณารอประกาศจากผู้จัดการสอบ</div>}
           {ph === 'closed' && <div className="alert bad">การสอบนี้ปิดแล้ว</div>}
         </div></div>
+        {chatEl}
       </>
     );
   }
@@ -250,6 +254,7 @@ export default function ExamRunner() {
           </div>
         </div></div>
       )}
+      {chatEl}
     </>
   );
 }

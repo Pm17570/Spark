@@ -3,8 +3,10 @@ import { useCallback, useEffect, useState } from 'react';
 import AdminShell from '@/components/admin/AdminShell';
 import { api, fmtDT } from '@/lib/client';
 import { PHASE } from '@/lib/model';
+import { useStaff } from '@/components/admin/StaffContext';
 
 function List() {
+  const isAdmin = useStaff().role === 'admin';
   const [exams, setExams] = useState(null);
   const [title, setTitle] = useState('');
   const [err, setErr] = useState('');
@@ -25,11 +27,11 @@ function List() {
   return (
     <div className="wrap">
       <h1>ข้อสอบทั้งหมด</h1>
-      <div className="card row">
+      {isAdmin && <div className="card row">
         <input className="input grow" placeholder="ชื่อข้อสอบใหม่" value={title} onChange={(e) => setTitle(e.target.value)} />
         <button className="btn primary" onClick={() => create(false)}>+ สร้างข้อสอบ</button>
         <button className="btn" onClick={() => create(true)}>สร้างข้อสอบตัวอย่าง</button>
-      </div>
+      </div>}
       {err && <div className="alert bad">{err}</div>}
       {exams === null ? <p className="muted">กำลังโหลด…</p> : exams.length === 0 ? <div className="card muted center">ยังไม่มีข้อสอบ</div> : exams.map((e) => {
         const [lab, cls] = PHASE[e.phase];
@@ -42,7 +44,7 @@ function List() {
             </div>
             <div className="row between" style={{ marginTop: 10 }}>
               <div className="small">ผู้เข้าสอบ {e.participants} · เริ่มแล้ว {e.started} · ส่งแล้ว {e.submitted}</div>
-              <div className="row"><a className="btn primary sm" href={`/admin/exams/${e.id}`} style={{ textDecoration: 'none' }}>จัดการ</a><button className="btn danger sm" onClick={() => del(e)}>ลบ</button></div>
+              <div className="row"><a className="btn primary sm" href={`/admin/exams/${e.id}`} style={{ textDecoration: 'none' }}>{isAdmin ? 'จัดการ' : 'เข้าดู'}</a>{isAdmin && <button className="btn danger sm" onClick={() => del(e)}>ลบ</button>}</div>
             </div>
           </div>
         );

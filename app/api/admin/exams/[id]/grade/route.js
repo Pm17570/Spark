@@ -1,4 +1,4 @@
-import { json, fail, readJson, isAdmin, noAdmin } from '@/lib/auth';
+import { json, fail, readJson, getStaff, noStaff } from '@/lib/auth';
 import { loadExam, rowsForPart, setGrade, participantById, getAnswers, gradesOf, answersOfExam, gradesOfExam, listParticipants } from '@/lib/repo';
 import { allParts } from '@/lib/model';
 import { gradeAttempt, autoGradePart } from '@/lib/grade';
@@ -9,7 +9,8 @@ export const dynamic = 'force-dynamic';
 // GET ?participantId → ตรวจทีละคน
 // GET (ไม่มีพารามิเตอร์) → { pending: { partId: จำนวนที่รอตรวจ } }
 export async function GET(req, { params }) {
-  if (!(await isAdmin())) return noAdmin();
+  const st = await getStaff();
+  if (!st) return noStaff();
   const id = (await params).id;
   const exam = loadExam(id);
   if (!exam) return fail('ไม่พบข้อสอบ', 404);
@@ -30,7 +31,7 @@ export async function GET(req, { params }) {
         const value = r.value;
         const a = autoGradePart(x.p, value);
         const manual = typeof r.manual === 'number' ? r.manual : null;
-        return { participantId: r.id, name: r.name, code: r.code, school: r.school, value, auto: a.score, max: a.max, needsManual: manual === null && a.needsManual, manual, score: manual ?? a.score };
+        return { participantId: r.id, name: r.name, code: st.role === 'admin' ? r.code : '', school: r.school, value, auto: a.score, max: a.max, needsManual: manual === null && a.needsManual, manual, score: manual ?? a.score };
       });
     const filtered = only === 'pending' ? all.filter((r) => r.needsManual) : all;
     return json({ part: { ...x.p, full: x.full }, total: filtered.length, rows: filtered.slice(offset, offset + limit) });
@@ -42,7 +43,7 @@ export async function GET(req, { params }) {
     const ans = getAnswers(pid);
     const g = gradeAttempt(exam, ans, gradesOf(pid));
     return json({
-      participant: { id: p.id, name: p.name, code: p.code },
+      participant: { id: p.id, name: p.name, code: st.role === 'admin' ? p.code : '' },
       score: g.score, max: g.max,
       items: parts.map((x) => ({ partId: x.p.id, full: x.full, part: x.p, value: ans[x.p.id] ?? null, ...g.parts[x.p.id] })),
     });
@@ -60,7 +61,8 @@ export async function GET(req, { params }) {
 }
 
 export async function POST(req, { params }) {
-  if (!(await isAdmin())) return noAdmin();
+  const st = await getStaff();
+  if (!st) return noStaff();
   const id = (await params).id;
   const exam = loadExam(id);
   if (!exam) return fail('ไม่พบข้อสอบ', 404);
