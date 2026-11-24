@@ -76,7 +76,6 @@ export default function AdminShell({ current = 'exams', children }) {
         <input id="pw" type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="รหัสผ่าน" autoComplete="current-password" autoFocus />
         {err && <div className="alert bad">{err}</div>}
         <button className="btn primary lg" disabled={!pw}>เข้าสู่ระบบ</button>
-        <div className="small muted">ผู้ดูแลหลัก: รหัสผ่านครั้งแรกอยู่ใน console / ไฟล์ data/ADMIN-PASSWORD.txt · ผู้ช่วย (moderator): ใช้ชื่อผู้ใช้ที่ผู้ดูแลสร้างให้</div>
       </form>
       <a href="/" className="small muted">← หน้าเข้าสอบ</a>
     </div></div>

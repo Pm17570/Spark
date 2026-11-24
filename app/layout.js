@@ -1,7 +1,7 @@
 import 'katex/dist/katex.min.css';
 import './globals.css';
 
-export const metadata = { title: 'SPARK — ระบบสอบออนไลน์', description: 'SPARK online individual exam system' };
+export const metadata = { title: 'SPARK — Examination System', description: 'SPARK online individual exam system' };
 export const viewport = { width: 'device-width', initialScale: 1, themeColor: '#2a1f78' };
 
 export default function RootLayout({ children }) {
